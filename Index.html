@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 Calculadora de Market Share de Smartphones</title>
+    <style>
+        /* --- Estilos CSS --- */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #0b377d;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #75a2eb;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .input-group label {
+            width: 100px;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        .input-group input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            text-align: right;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .result-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #ecf0f1;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .result-group span.share {
+            color: #27ae60;
+        }
+        
+        #total-sales {
+            font-size: 1.1em;
+            color: #e74c3c;
+        }
+
+        .reset-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 25px;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+
+        .reset-button:hover {
+            background-color: #e67e22;
+        }
+
+        .total-box {
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-radius: 6px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        
+        .percentage {
+            width: 80px;
+            text-align: right;
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📱 Market Share Calculator</h1>
+    <div id="inputs">
+        </div>
+
+    <div class="total-box">
+        Total de Vendas: <span id="total-sales">0</span>
+    </div>
+
+    <div id="results">
+        <h2>Resultados do Share</h2>
+        </div>
+
+    <button class="reset-button" onclick="resetForm()">Limpar Tudo</button>
+</div>
+
+<script>
+    /* --- JavaScript para Lógica de Cálculo --- */
+
+    const brands = [
+        { id: 'motorola', name: 'Motorola', color: '#232324' },
+        { id: 'samsung', name: 'Samsung', color: '#232324' },
+        { id: 'xiaomi', name: 'Xiaomi', color: '#232324' },
+        { id: 'oppo', name: 'Oppo', color: '#232324' },
+        { id: 'Jovi', name: 'Jovi', color: '#232324' },
+        { id: 'apple', name: 'Apple', color: '#232324' }
+    ];
+
+    const inputsDiv = document.getElementById('inputs');
+    const resultsDiv = document.getElementById('results');
+    const totalSalesSpan = document.getElementById('total-sales');
+
+    // 1. Geração Dinâmica dos Inputs
+    brands.forEach(brand => {
+        const group = document.createElement('div');
+        group.className = 'input-group';
+        group.innerHTML = `
+            <label for="${brand.id}">${brand.name}</label>
+            <input type="number" id="${brand.id}" value="0" min="0" oninput="calculateShare()" placeholder="Vendas">
+            <span class="percentage" id="share-${brand.id}" style="color: ${brand.color};">0.00%</span>
+        `;
+        inputsDiv.appendChild(group);
+    });
+
+    function calculateShare() {
+        let totalSales = 0;
+        const salesData = {};
+
+        // 2. Coletar dados e calcular o total
+        brands.forEach(brand => {
+            const input = document.getElementById(brand.id);
+            const sales = parseFloat(input.value) || 0;
+            salesData[brand.id] = sales;
+            totalSales += sales;
+        });
+
+        totalSalesSpan.textContent = totalSales.toLocaleString('pt-BR');
+
+        // 3. Calcular e exibir o share individual
+        brands.forEach(brand => {
+            const shareElement = document.getElementById(`share-${brand.id}`);
+            const sales = salesData[brand.id];
+            let share = 0;
+
+            if (totalSales > 0) {
+                share = (sales / totalSales) * 100;
+            }
+
+            shareElement.textContent = share.toFixed(2) + '%';
+        });
+
+        // Opcional: Recalcular e exibir o total de share (que deve ser 100%)
+        // Como o share individual já é exibido, não é necessário um bloco extra para o resultado.
+    }
+
+    function resetForm() {
+        brands.forEach(brand => {
+            document.getElementById(brand.id).value = '0';
+        });
+        calculateShare(); // Recalcula com todos os valores zerados
+    }
+
+    // Chamada inicial para configurar a tela com 0%
+    calculateShare();
+
+</script>
+
+</body>
+</html>
